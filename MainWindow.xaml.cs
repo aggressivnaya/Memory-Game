@@ -24,10 +24,50 @@ namespace MemoryGame1
         int mone = 0;
         int count = 4;
         int move = 0;
+        Random rnd = new Random();
+        List<Image> ImgObj = new List<Image>();
+        List<Button> btnObj = new List<Button>();
+        List<string> imageNames = new List<string>() { "cat1jpg.jpg", "cat2.jpg", "cat3.jpg" , "cat41.jpg" };
 
         public MainWindow()
         {
             InitializeComponent();
+
+            foreach(UIElement ctrl in this.myGrid.Children)
+            {
+                if(ctrl is Button) this.btnObj.Add(ctrl as Button);
+                else
+                if (ctrl is Image) this.ImgObj.Add(ctrl as Image);
+            }
+
+            while(imageNames.Count > 0)
+            {
+                int img = rnd.Next(imageNames.Count);
+
+                var uri = new Uri("pack://application:,,,/Images/" + imageNames[img]);
+                var bitmap = new BitmapImage(uri);
+
+                for(int i = 0;i < 2;i++)
+                {
+                    int inx = findFreeBtn();
+                    ImgObj[inx].Source = bitmap;
+                    btnObj[inx].Tag = imageNames[img];
+                }
+                imageNames.RemoveAt(img);
+            }
+        }
+
+        private int findFreeBtn()
+        {
+            int inx = -1;
+            int x;
+            while(inx < 0)
+            {
+                x = rnd.Next(btnObj.Count);
+                if (btnObj[x].Tag == null) 
+                    inx = x;
+            }
+            return inx;
         }
 
         private void BtnClick(object sender, RoutedEventArgs e)
