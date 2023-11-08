@@ -24,23 +24,27 @@ namespace MemoryGame1
         int mone = 0;
         int count = 4;
         int move = 0;
+        int imgCount = 0;
         Random rnd = new Random();
         List<Image> ImgObj = new List<Image>();
         List<Button> btnObj = new List<Button>();
-        List<string> imageNames = new List<string>() { "cat1jpg.jpg", "cat2.jpg", "cat3.jpg" , "cat41.jpg" };
+        List<string> imageNames_All = new List<string>() { "cat1jpg.jpg", "cat2.jpg", "cat3.jpg", "cat41.jpg" };
+        
 
         public MainWindow()
         {
             InitializeComponent();
+            BuildBtn_Click(null, null);
+            List<string> imageNames = new List<string>(imageNames_All);
 
-            foreach(UIElement ctrl in this.myGrid.Children)
+            foreach (UIElement ctrl in this.myGrid.Children)
             {
                 if(ctrl is Button) this.btnObj.Add(ctrl as Button);
                 else
                 if (ctrl is Image) this.ImgObj.Add(ctrl as Image);
             }
 
-            while(imageNames.Count > 0)
+            while(imageNames.Count > 0 && imgCount < this.count)
             {
                 int img = rnd.Next(imageNames.Count);
 
@@ -50,11 +54,45 @@ namespace MemoryGame1
                 for(int i = 0;i < 2;i++)
                 {
                     int inx = findFreeBtn();
-                    ImgObj[inx].Source = bitmap;
+                    Grid grid = btnObj[inx].Parent as Grid;
+                    grid.Background = new ImageBrush(bitmap);
                     btnObj[inx].Tag = imageNames[img];
                 }
+                imgCount++;
                 imageNames.RemoveAt(img);
             }
+        }
+
+        private void build()
+        {
+            btn1 = null;
+            btn2 = null;
+            mone = 0;
+            count = 4;
+            move = 0;
+            imgCount = 0;
+            this.myGrid.Children.Clear();
+            btnObj.Clear();
+
+            for(int i = 0;i < this.count*2;i++)
+            {
+                Grid grid = new Grid();
+                grid.Margin = new Thickness(10);
+
+                Button btn = new Button();
+                btn.Click += BtnClick;
+
+                grid.Children.Add(btn);
+                this.myGrid.Children.Add(grid);
+
+                btnObj.Add(btn);
+            }
+        }
+
+        private void BuildBtn_Click(object sender, RoutedEventArgs e)
+        {
+            this.count = int.Parse(this.SizeTxt.Text);
+            build();
         }
 
         private int findFreeBtn()
@@ -90,7 +128,9 @@ namespace MemoryGame1
                 else
                 {
                     if (btn1.Tag.Equals(btn2.Tag))
+                    {
                         mone++;
+                    }
                     else
                     {
                         btn1.Visibility = Visibility.Visible;
